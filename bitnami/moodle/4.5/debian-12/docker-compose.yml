@@ -7,34 +7,43 @@ services:
     environment:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
       - ALLOW_EMPTY_PASSWORD=no
-      - MARIADB_USER=bn_moodle
-      - MARIADB_DATABASE=bitnami_moodle
-      - MARIADB_CHARACTER_SET=utf8mb4
-      - MARIADB_COLLATE=utf8mb4_unicode_ci
-      - MARIADB_PASSWORD=moodlepassword
-      - MARIADB_ROOT_PASSWORD=rootpassword
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_CHARACTER_SET=${MARIADB_CHARACTER_SET}
+      - MARIADB_COLLATE=${MARIADB_COLLATE}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     volumes:
       - /opt/moodle/mariadb:/var/lib/mysql  # Persistencia de la base de datos
+    env_file:
+      - '.env'
   moodle:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - EXTRA_LOCALES=es_ES.UTF-8 UTF-8
     ports:
       - '8080:8080'
       - '8443:8443'
     environment:
       - MOODLE_DATABASE_HOST=mariadb
       - MOODLE_DATABASE_PORT_NUMBER=3306
-      - MOODLE_DATABASE_USER=bn_moodle
-      - MOODLE_DATABASE_NAME=bitnami_moodle
-      - MOODLE_DATABASE_PASSWORD=moodlepassword
-      - MOODLE_USERNAME=admin
-      - MOODLE_PASSWORD=adminpassword
+      - MOODLE_DATABASE_USER=${MARIADB_USER}
+      - MOODLE_DATABASE_NAME=${MARIADB_DATABASE}
+      - MOODLE_DATABASE_PASSWORD=${MARIADB_PASSWORD}
+      - MOODLE_USERNAME=${MOODLE_USERNAME}
+      - MOODLE_PASSWORD=${MOODLE_PASSWORD}
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
       - ALLOW_EMPTY_PASSWORD=no
+      - MOODLE_SITE_NAME=${MOODLE_SITE_NAME}
+      - MOODLE_LANG=es
+      - MOODLE_EMAIL=${MOODLE_EMAIL}
     volumes:
       - /opt/moodle/moodle:/bitnami/moodle        # Archivos de Moodle
       - /opt/moodle/moodledata:/bitnami/moodledata # Datos subidos por usuarios (ej: cursos)
     depends_on:
       - mariadb
+    env_file:
+      - '.env'
 
